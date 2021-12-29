@@ -4,26 +4,35 @@
 <head>
     <title>FlaskTest</title>
 </head>
- 
+<link rel="stylesheet" type="text/css" href="static/index.css" />
+<link
+  rel="shortcut icon"
+  href="{{ url_for('static', filename='favicon.ico') }}"
+/>
 <body>
-    <h2>Welcome To GFG</h2>
-    <h4>Flask: Rendering Templates</h4>
-     
-    <a href ="/gauges">guage plot</a>
-    <a href ="/languages">languages plot</a>
-    <a href ="/radar">radar plot</a>
     
- 
- 
- 
- 
-<p>This is a Flask application.</p>
- 
- 
- 
- 
- 
- 
+    <div class= "main-outer">
+        <div class = "first-box">
+            <p>Enter a valid github username</p> 
+            <form method="POST">
+                <input name="text">
+                <input type="submit">
+            </form>
+        </div> 
+        <div class = "second-box">
+            <img src="https://avatars.githubusercontent.com/u/78031087?v=4" alt="Girl in a jacket" width="20" height="20">
+            
+            
+            <p>Enter a username and the name of a valid github repo associated with said user.</p> 
+            <form method="POST">
+                <input name="username">
+                <input name="repository">
+                <input type="submit">
+            </form>             
+        </div> 
+    </div>
+
+
 </body>
  
 </html>

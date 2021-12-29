@@ -1,38 +1,56 @@
+from pygal.style import LightColorizedStyle
+import pygal
+import base64
+import requests
+from github import Github
+from pprint import pprint
+import json
+from hidden import username 
+from hidden import auth_token
 
-# total_contributions = 0 
+repo_list_names = ["a","b"]
+repoValueTotal= []
 
-# average_conrtributions = 0
+username = "terlo"
+#g = Github(auth_token)
+g = Github()
+user=g.get_user(username)
 
-# g = Github(auth_token)
-# user=g.get_user(username)
-
-# radar_chart = pygal.Radar()
-# radar_chart.title = 'User Contributions'
-# radar_chart.x_labels = ['Richards', 'DeltaBlue', 'Crypto', 'RayTrace', 'EarleyBoyer', 'RegExp', 'Splay', 'NavierStokes']
-# radar_chart.add('Chrome', [6395, 8212, 7520, 7218, 12464, 1660, 2123, 8607])
-# radar_chart.add('Firefox', [7473, 8099, 11700, 2651, 6361, 1044, 3797, 9450])
-# radar_chart.add('Opera', [3472, 2933, 4203, 5229, 5810, 1828, 9013, 4669])
-# radar_chart.add('IE', [43, 41, 59, 79, 144, 136, 34, 102])
-# # radar_chart.render_in_browser()
-# radar_chart.render_data_uri
-
-# dict 
-
-
-thisdict = {
-  "brand": "Ford",
-  "electric": False,
-  "year": 1964,
-  "colors": ["red", "white", "blue"]
-}
-thisdict["colors"].append("yellow")
-
-print(thisdict)
+once = False
+repositories = user.get_repos()
 
 
 
-# print(requests.get(user.followers_url).json())
-# for account in requests.get(user.followers_url).json():
-#     print(account["login"])
+username="Terlo"
+repo="Clothes-Annotation-Web-App"
+
+def contributorsURL(username, repo):
+  link =  "https://api.github.com/repos/"+username+"/"+repo+"/contributors"
+  return link
     
+
+link = contributorsURL(username,repo)
+data  = requests.get(link).json()
+pprint(data)
+
+avatar,names,contribs= [], [], []
+for collection in data:
+    names.append(collection['login'])
+    contribs.append(collection['contributions'])
+    avatar.append(collection['avatar_url'])
     
+total_contributions = sum(contribs)
+
+
+
+print(names)
+print(avatar)
+print(contribs)
+
+# commits= requests.get(commits_json).json()
+# contribs= requests.get(contributors_json).json()
+# merges= requests.get(merges_json).json()
+
+# pprint(f"\ncommits :\n {commits}")
+# pprint(f"\ncontributions : \n{contribs}")
+# pprint(f"\nmerges : \n{merges}")
