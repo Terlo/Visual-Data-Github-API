@@ -26,7 +26,8 @@
       padding-top: 50px;
       
   }
-  .repo-arrangements {
+  .repoz{
+    background-color: magenta;
     color:red;
     float: left;
     height: 470px;
