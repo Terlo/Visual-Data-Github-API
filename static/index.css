@@ -6,32 +6,77 @@
     margin: 50px
   }
   
-  .first-box p {
-    color: black;
-    padding-left: 80px;
-    padding-top: 50px;
-  }
-  
-  .second-box {
-    width:300px; 
-    height: 150px; 
-    float:right; 
-    background: aliceblue;
-    margin: 50px
-  }
-  
-  .second-box p {
-      color:black;
-      padding-left: 110px;
-      padding-top: 50px;
-      
-  }
-  .repoz{
-    background-color: magenta;
-    color:red;
-    float: left;
-    height: 470px;
-    width: 23%;
-    padding: 0 10px;
+.first-box p {
+  color: black;
+  padding-left: 80px;
+  padding-top: 50px;
+}
 
-  }
+.second-box {
+  width:300px; 
+  height: 150px; 
+  float:right; 
+  background: aliceblue;
+  margin: 50px
+}
+
+.second-box p {
+    color:black;
+    padding-left: 110px;
+    padding-top: 50px;
+    
+}
+.repoz{
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f9f9fb;
+  box-shadow: 3px;
+  color: black;
+  float: left;
+  width: 23%;
+  padding: 20px;
+  margin: 20px; 
+}
+h1.repoz{
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.the-user{
+  padding: 20px;
+  margin: 20px;
+  background-color: blueviolet;
+}
+.avatar1{
+  border-radius: 25%;
+}
+.bodys{
+  color: tomato;
+}
+.container1{
+  padding: 25px;
+  margin: 50px;
+  color: slateblue;
+}
+
+/* .user-details{
+  background-color:#f9f9fb;
+  padding: 20px;
+  margin: 20px;
+  
+} */
+.containerz{
+  background-color: pink;
+  padding: 50px;
+  margin: 50px;
+  box-shadow: 5px;
+}
+p.containerz{
+  font-family: Arial, Helvetica, sans-serif;
+}
+.center{
+  
+    margin: auto;
+    width: 50%;
+    /* border: 3px solid green; */
+    padding: 10px;
+  
+}

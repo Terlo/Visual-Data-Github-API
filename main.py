@@ -71,49 +71,50 @@ def occurs(listval, item):
             count = count + 1
     return count
 
+# @app.route('/test')
+# def my_foram():
+#     return render_template('test.html')
 
-@app.route('/')
-def my_form():
-    return render_template('index.html')
+# @app.route('/index')
+# def my_form():
+#     return render_template('index.html')
 
-@app.route('/', methods=['POST'])
-def my_form_post():
-    cumulative_languages_list = []
-    lan_list=[]
-    language_count=[]
-    languages_list=[]
-    total_languages = 0
+# @app.route('/index', methods=['POST'])
+# def my_form_post():
+#     cumulative_languages_list = []
+#     lan_list=[]
+#     language_count=[]
+#     languages_list=[]
+#     total_languages = 0
 
-    text = request.form['text']
-    processed_text = text
+#     text = request.form['text']
+#     processed_text = text
     
-    g = Github()
-    user=g.get_user(processed_text)
-    
 
-    for x in user.get_repos():
-    #print(f"repo name is: {x.name} the majority language is:{x.language}")
-    #collect all of the languages that exist in the repositories.
-        if x.language not in languages_list:
-            languages_list.append(x.language)
-            total_languages = total_languages+1     
-        cumulative_languages_list.append(x.language)
+#     for x in user.get_repos():
+#     #print(f"repo name is: {x.name} the majority language is:{x.language}")
+#     #collect all of the languages that exist in the repositories.
+#         if x.language not in languages_list:
+#             languages_list.append(x.language)
+#             total_languages = total_languages+1     
+#         cumulative_languages_list.append(x.language)
 
-    for i in range(len(languages_list)):
-        res = occurs(cumulative_languages_list,languages_list[i])
-        lan_list.append((languages_list[i],res))
-        #print(f"{lan_list} \n")
+#     for i in range(len(languages_list)):
+#         res = occurs(cumulative_languages_list,languages_list[i])
+#         lan_list.append((languages_list[i],res))
+#         #print(f"{lan_list} \n")
 
        
        
-    bar_chart = pygal.HorizontalBar()
-    bar_chart.title = processed_text+'\'s Languages used'
-    for x in range(len(lan_list)):
-        bar_chart.add(lan_list[x][0],lan_list[x][1])
+#     bar_chart = pygal.HorizontalBar( style=LightColorizedStyle)
+#     bar_chart.title = processed_text+'\'s Languages used'
+#     for x in range(len(lan_list)):
+#         bar_chart.add(lan_list[x][0],lan_list[x][1])
 
 
-    graph_data = bar_chart.render_data_uri() 
-    return render_template("radar.html",graph_data=graph_data)
+#     graph_data = bar_chart.render_data_uri() 
+#     return render_template("gauge.html",
+#                            graph_data=graph_data)
 
 
 
@@ -121,23 +122,35 @@ def contributorsURL(username, repo):
     link =  "https://api.github.com/repos/"+username+"/"+repo+"/contributors"
     return link
 
-@app.route('/repo')
+@app.route('/')
 def my_formz():
-    return render_template('index.html')
+    return render_template('gauge.html')
 
-@app.route("/repo",methods=['POST'])
+@app.route("/",methods=['POST'])
 def gauges():
     r_name,r_additions,r_deletions,perc_deletions,perc_additions,r_commits =[],[],[],[],[],[]
     try:
          
         username = request.form['username']    
-        repo = request.form['repository']    
+        repo = request.form['repository']
+        try:
+            auth_token = request.form['auth_token']
+            g = Github(auth_token)
+        finally:
+            g = Github()
+            user=g.get_user(username)
         # username="Terlo"
         # repo="Clothes-Annotation-Web-App"
 
         link = contributorsURL(username,repo)
-        data  = requests.get(link).json()
+        data  = requests.get(link).json() 
         pprint(data)  
+    
+        user_followers  =user.followers
+        user_following  =user.following
+        
+        print(f"{user.name} has {user_followers} followers")
+        print(f"{user.name} has {user_following} following")
 
         avatar,names,contribs= [], [], []
         for collection in data:
@@ -148,7 +161,7 @@ def gauges():
         total_contributions = sum(contribs)
         
         
-        pie_chart = pygal.Pie(inner_radius=.75, style=DarkColorizedStyle)
+        pie_chart = pygal.Pie(inner_radius=.75, style=LightColorizedStyle)
         pie_chart.title = 'Contributions to '+ repo+ ' by users.'
 
         for i in range(len(names)):
@@ -207,8 +220,8 @@ def gauges():
                                         
                 for i in range(len(r_name)):  
                     print(r_name[i],r_additions[i],r_deletions[i],r_commits[i])
-                radar_chart = pygal.Radar( style=DarkColorizedStyle)
-                radar_chart.title = 'ratio of addition:deleltion of lines of code per commit'
+                radar_chart = pygal.Radar( style=LightColorizedStyle )
+                radar_chart.title = 'ratio of addition to deletion of lines of code per user (%)'
                 radar_chart.x_labels =r_name
                 
                 
@@ -229,23 +242,54 @@ def gauges():
         repositories = user.get_repos()
         #repoName = "Clothes-Annotation-Web-App"
         y_values = []
+        lans = []
+
+        import datetime
+        date_array = []
+
+        for i in range(52):
+            index = 7*i
+            the_date = (datetime.datetime.now() + datetime.timedelta(days=-index))
+            the_date = str(the_date)
+            the_date = the_date.split(" ")[0]
+            date_array.append(the_date)
+
+        date_array = date_array[::-1]
+        print("\n",date_array)
         for x in repositories:
             if repoName in x.name:
                 #print("found the repo :DDDDDD")
                 y_values = x.get_stats_participation().all
+                
+                
+                lans = [(k, v) for k, v in x.get_languages().items()]    
                 print(y_values)
         #bar_chart = pygal.HorizontalBar()
-        line_chart = pygal.StackedLine(fill=True, style=DarkColorizedStyle)
-        line_chart.title = 'commits lol'
-        line_chart.x_labels = map(str, range(52))
+        line_chart = pygal.StackedLine(fill=True, style=LightColorizedStyle)
+        line_chart.title = 'commits per week for the last 52 weeks'
+        line_chart.x_labels = map(str,date_array)
         line_chart.add('commits', y_values)
+        
+        
+        
+        gauge_chart = pygal.Gauge(human_readable=True, style=LightColorizedStyle)
+        gauge_chart.title = 'language prevalence:(lines of code)'
+        gauge_chart.range = [0, 100000]
+        for i in range(len(lans)):
+            gauge_chart.add(lans[i][0], lans[i][1])
+        
 
         graph_data2 = line_chart.render_data_uri() 
+        graph_data3 = gauge_chart.render_data_uri() 
         
         return render_template("radar.html",
+                               username =user.name,
+                               user_followers = user_followers,
+                               user_following = user_following,
                                graph_data = graph_data,
                                graph_data1 = graph_data1,
                                graph_data2 = graph_data2,
+                               graph_data3 = graph_data3,
                                avatar=avatar,
                                contribs= contribs,
                                names=names,
@@ -257,107 +301,107 @@ def gauges():
         
 
 
-@app.route("/w")
-def radar_test():
-    try:
+# @app.route("/w")
+# def radar_test():
+#     try:
         
-        username = "terlo"
-        #g = Github(auth_token)
-        g = Github()
-        user=g.get_user(username)
+#         username = "terlo"
+#         #g = Github(auth_token)
+#         g = Github()
+#         user=g.get_user(username)
 
-        once = False
-        repositories = user.get_repos()
-        repoName = "Clothes-Annotation-Web-App"
-        y_values = []
-        for x in repositories:
-            if repoName in x.name:
-                print("found the repo :DDDDDD")
-                y_values = x.get_stats_participation().all
-                print(y_values)
-        #bar_chart = pygal.HorizontalBar()
-        line_chart = pygal.StackedLine(fill=True, style=DarkColorizedStyle)
-        line_chart.title = 'commits lol'
-        line_chart.x_labels = map(str, range(52))
-        line_chart.add('commits', y_values)
+#         once = False
+#         repositories = user.get_repos()
+#         repoName = "Clothes-Annotation-Web-App"
+#         y_values = []
+#         for x in repositories:
+#             if repoName in x.name:
+#                 print("found the repo :DDDDDD")
+#                 y_values = x.get_stats_participation().all
+#                 print(y_values)
+#         #bar_chart = pygal.HorizontalBar()
+#         line_chart = pygal.StackedLine(fill=True, style=DarkColorizedStyle)
+#         line_chart.title = 'commits lol'
+#         line_chart.x_labels = map(str, range(52))
+#         line_chart.add('commits', y_values)
 
-        line_chart.render()
-        graph_data = line_chart.render_data_uri() 
-        return render_template("languages.html", graph_data = graph_data)
-    except Exception as e:
-        return (str(e))
+#         line_chart.render()
+#         graph_data = line_chart.render_data_uri() 
+#         return render_template("languages.html", graph_data = graph_data)
+#     except Exception as e:
+#         return (str(e))
 
-@app.route("/a")
-def radar():
-    r_name,r_additions,r_deletions,perc_deletions,perc_additions,r_commits =[],[],[],[],[],[]
-    try:
+# @app.route("/a")
+# def radar():
+#     r_name,r_additions,r_deletions,perc_deletions,perc_additions,r_commits =[],[],[],[],[],[]
+#     try:
         
-        username = "terlo"
-        repoName = "Clothes-Annotation-Web-App"
-        #g = Github(auth_token)
-        g = Github()
-        user=g.get_user(username)
-        repositories = user.get_repos()
+#         username = "terlo"
+#         repoName = "Clothes-Annotation-Web-App"
+#         #g = Github(auth_token)
+#         g = Github()
+#         user=g.get_user(username)
+#         repositories = user.get_repos()
 
-        for x in repositories:
-            if repoName in x.name:
-                required_repo = x
-                # pprint(f"\n weekly commit statistics1 ->\n{x.get_stats_participation().all}")
-                print("\n\n------------------------------------------------------------------------")
-                the_data  = required_repo.get_stats_contributors()
+#         for x in repositories:
+#             if repoName in x.name:
+#                 required_repo = x
+#                 # pprint(f"\n weekly commit statistics1 ->\n{x.get_stats_participation().all}")
+#                 print("\n\n------------------------------------------------------------------------")
+#                 the_data  = required_repo.get_stats_contributors()
                 
-                for i in range(len(the_data)):
-                    addition_count =0
-                    deletion_count =0
-                    commit_count =0
+#                 for i in range(len(the_data)):
+#                     addition_count =0
+#                     deletion_count =0
+#                     commit_count =0
                     
-                    for j in range(len(the_data[i].raw_data['weeks'])):
-                    # print(f"\n the author{the_data[i].author}")
-                    # pprint(f"additions: {the_data[i].raw_data['weeks'][j]['a']} ")
-                    # pprint(f"deletions: {the_data[i].raw_data['weeks'][j]['d']} ")
-                    # pprint(f"contributions: {the_data[i].raw_data['weeks'][j]['c']} ")
+#                     for j in range(len(the_data[i].raw_data['weeks'])):
+#                     # print(f"\n the author{the_data[i].author}")
+#                     # pprint(f"additions: {the_data[i].raw_data['weeks'][j]['a']} ")
+#                     # pprint(f"deletions: {the_data[i].raw_data['weeks'][j]['d']} ")
+#                     # pprint(f"contributions: {the_data[i].raw_data['weeks'][j]['c']} ")
                         
-                        addition_count = the_data[i].raw_data['weeks'][j]['a'] +addition_count
-                        deletion_count = the_data[i].raw_data['weeks'][j]['d'] +deletion_count
-                        commit_count = the_data[i].raw_data['weeks'][j]['c'] +commit_count
+#                         addition_count = the_data[i].raw_data['weeks'][j]['a'] +addition_count
+#                         deletion_count = the_data[i].raw_data['weeks'][j]['d'] +deletion_count
+#                         commit_count = the_data[i].raw_data['weeks'][j]['c'] +commit_count
                         
-                    print(f"{the_data[i].author} has a total of {addition_count} additions, {deletion_count}, deletions {commit_count}, commits")
-                    r_name.append(the_data[i].author.login)
-                    r_additions.append(addition_count)
-                    r_deletions.append(deletion_count)
-                    r_commits.append(commit_count)
-                    a = ((addition_count)/((addition_count)+(deletion_count)))
-                    b = ((deletion_count)/((addition_count)+(deletion_count)))
+#                     print(f"{the_data[i].author} has a total of {addition_count} additions, {deletion_count}, deletions {commit_count}, commits")
+#                     r_name.append(the_data[i].author.login)
+#                     r_additions.append(addition_count)
+#                     r_deletions.append(deletion_count)
+#                     r_commits.append(commit_count)
+#                     a = ((addition_count)/((addition_count)+(deletion_count)))
+#                     b = ((deletion_count)/((addition_count)+(deletion_count)))
                     
-                    _a = a*100
-                    _b = b*100
+#                     _a = a*100
+#                     _b = b*100
                     
-                    # print(f"_a :{_a}")
-                    # print(f"_b :{_b}")
-                    perc_additions.append(_a)
-                    perc_deletions.append(_b)
+#                     # print(f"_a :{_a}")
+#                     # print(f"_b :{_b}")
+#                     perc_additions.append(_a)
+#                     perc_deletions.append(_b)
                     
                     
-                    print(perc_additions)
-                    print(perc_deletions)
+#                     print(perc_additions)
+#                     print(perc_deletions)
                                         
-                for i in range(len(r_name)):  
-                    print(r_name[i],r_additions[i],r_deletions[i],r_commits[i])
-                radar_chart = pygal.Radar( style=DarkColorizedStyle)
-                radar_chart.title = 'ratio of addition:deleltion of lines of code per commit'
-                radar_chart.x_labels =r_name
+#                 for i in range(len(r_name)):  
+#                     print(r_name[i],r_additions[i],r_deletions[i],r_commits[i])
+#                 radar_chart = pygal.Radar( style=DarkColorizedStyle)
+#                 radar_chart.title = 'ratio of addition:deleltion of lines of code per commit'
+#                 radar_chart.x_labels =r_name
                 
                 
-                radar_chart.add("code commits", r_commits)
-                radar_chart.add("code additions(%)", perc_additions)
-                radar_chart.add("code deletions(%)", perc_deletions)
-                radar_chart.render()        
-            break      
-        graph_data = radar_chart.render_data_uri()
-        print("made it here lol") 
-        return render_template("languages.html", graph_data = graph_data)
-    except Exception as e:
-            return "print_exc()"
+#                 radar_chart.add("code commits", r_commits)
+#                 radar_chart.add("code additions(%)", perc_additions)
+#                 radar_chart.add("code deletions(%)", perc_deletions)
+#                 radar_chart.render()        
+#             break      
+#         graph_data = radar_chart.render_data_uri()
+#         print("made it here lol") 
+#         return render_template("languages.html", graph_data = graph_data)
+#     except Exception as e:
+#             return "print_exc()"
 
 
 
