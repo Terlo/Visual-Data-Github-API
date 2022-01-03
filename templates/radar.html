@@ -21,29 +21,18 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-  { % comment %} <link rel="stylesheet" href="css/styles.css?v=1.0"> { % endcomment %}
+  <link rel="stylesheet" href="css/styles.css?v=1.0"> 
   <link rel="stylesheet" type="text/css" href="static/index.css" />
 
 </head>
 
 <body class="bodys">
-    <div class="the-user"> 
-      <p>this is the followers/following</p>
-      <div class="div-username">
-        {{username}}
-      </div>
-      <div>
-        {{user_following}}
-      </div>
-      <div>
-        {{user_followers}}
-      </div>
-    </div>
+    
     
     <div class="user-details">
       <div class="user-header">
         <h1> 
-          Repository Contrributors
+          Repository Contributors
         </h1>
       </div>
       {% for i in range(0, lenlist) %}
